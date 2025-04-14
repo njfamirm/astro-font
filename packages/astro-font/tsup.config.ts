@@ -9,6 +9,6 @@ export const tsup: Options = {
   format: ['esm'],
   platform: 'browser',
   noExternal: ['fontkit'],
-  entryPoints: ['./utils.ts'],
+  entryPoints: ['./utils.ts', './integration.ts'],
   external: ['node:fs', 'node:path', 'node:buffer', 'node:os'],
 }

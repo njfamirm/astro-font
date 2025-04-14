@@ -308,17 +308,24 @@ async function getFallbackFont(fontCollection: Config): Promise<Record<string, s
       if (tmpDir) {
         if (cacheDir) {
           if (!fs.existsSync(cacheDir)) {
-            fs.mkdirSync(cacheDir, { recursive: true })
-            if (fontCollection.verbose) {
-              console.log(`[astro-font] ▶ Created ${cacheDir}`)
+            // Check if writing files is permitted by the system
+            const writeAllowed = await ifFSOSWrites(process.cwd())
+            if (writeAllowed) {
+              fs.mkdirSync(cacheDir, { recursive: true })
+              if (fontCollection.verbose) {
+                console.log(`[astro-font] ▶ Created ${cacheDir}`)
+              }
             }
           }
         }
         if (cachedFilePath) {
           if (!fs.existsSync(cachedFilePath)) {
-            fs.writeFileSync(cachedFilePath, JSON.stringify(fallbackMetrics), 'utf8')
-            if (fontCollection.verbose) {
-              console.log(`[astro-font] ▶ Created ${cachedFilePath}`)
+            const writeAllowed = await ifFSOSWrites(process.cwd())
+            if (writeAllowed) {
+              fs.writeFileSync(cachedFilePath, JSON.stringify(fallbackMetrics), 'utf8')
+              if (fontCollection.verbose) {
+                console.log(`[astro-font] ▶ Created ${cachedFilePath}`)
+              }
             }
           }
         }
