@@ -4,6 +4,7 @@ import { relative } from 'pathe'
 import { Buffer } from 'node:buffer'
 import { getFallbackMetricsFromFontFile } from './font.ts'
 import { pickFontFileForFallbackGeneration } from './fallback.ts'
+import fetch from 'make-fetch-happen';
 
 type GlobalValues = 'inherit' | 'initial' | 'revert' | 'revert-layer' | 'unset'
 
@@ -118,10 +119,12 @@ export function getPreloadType(src: string) {
 }
 
 // Get the font whether remote or local buffer
-async function getFontBuffer(path: string): Promise<Buffer | undefined> {
+async function getFontBuffer(path: string, cacheDir?: string): Promise<Buffer | undefined> {
   const fs = await getFS()
   if (path.includes('https:') || path.includes('http:')) {
-    let tmp = await fetch(path)
+    let tmp = await fetch(path, {
+            cachePath: cacheDir,
+          })
     return Buffer.from(await tmp.arrayBuffer())
   } else {
     // If the file system has the access to the *local* font
@@ -229,6 +232,7 @@ export async function generateFonts(fontCollection: Config[]): Promise<Config[]>
     duplicatedCollection.map((config) =>
       config.googleFontsURL
         ? fetch(config.googleFontsURL, {
+            cachePath: config.cacheDir,
             headers: {
               'User-Agent':
                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
@@ -283,7 +287,7 @@ async function getFallbackFont(fontCollection: Config): Promise<Record<string, s
     }
     await Promise.all(
       fontCollection.src.map((i) =>
-        getFontBuffer(i.path).then((res) => {
+        getFontBuffer(i.path, fontCollection.cacheDir).then((res) => {
           if (res) {
             try {
               const resMetadata = create(res)

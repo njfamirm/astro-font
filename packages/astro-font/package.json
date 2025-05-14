@@ -40,8 +40,12 @@
   },
   "homepage": "https://www.launchfa.st/features/astro-font",
   "description": "An Astro integration to optimize Local & Google fonts inspired by @next/font",
+  "dependencies": {
+    "make-fetch-happen": "^14.0.3"
+  },
   "devDependencies": {
     "@types/fontkit": "^2.0.6",
+    "@types/make-fetch-happen": "^10.0.4",
     "@types/node": "^20.10.5",
     "fontkit": "^2.0.2",
     "pathe": "^1.1.2",
